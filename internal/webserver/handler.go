@@ -18,6 +18,8 @@ type handler struct {
 	templates    map[string]*template.Template
 }
 
+var developmentMode = false
+
 // todo 这里有三个方法没有实现
 func (h *handler) prepareSessionCache() {
 

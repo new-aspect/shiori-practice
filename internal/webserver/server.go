@@ -149,6 +149,10 @@ func ServeApp(cfg Config) error {
 	}
 
 	router.GET(jp("/js/*filepath"), withLogging(hdl.serveJsFile))
+	router.GET(jp("/res/*filepath"), withLogging(hdl.serveFile))
+	router.GET(jp("/css/*filepath"), withLogging(hdl.serveFile))
+	router.GET(jp("/founts/*filepath"), withLogging(hdl.serveFile))
+
 	// todo 这里还有很多接口
 
 	router.PanicHandler = func(w http.ResponseWriter, r *http.Request, arg interface{}) {
