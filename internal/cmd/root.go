@@ -81,7 +81,22 @@ func getDateDir(portableModel bool) (string, error) {
 	if developmentMode {
 		return "dev-data", nil
 	}
-	return "", nil
+
+	// Try to look at environment variables
+	dataDir, found := os.LookupEnv("SHIORI_DIR")
+	if found {
+		return dataDir, nil
+	}
+
+	// Try to use platform specific app path
+	//userScope := apppaths.NewScope(apppaths.User, "shiori")
+	//dataDir, err := userScope.DataPath("")
+	//if err == nil {
+	//	return dataDir, nil
+	//}
+
+	// When all fail, use current working directory
+	return ".", nil
 }
 
 func openDatabase(ctx context.Context) (database.DB, error) {
