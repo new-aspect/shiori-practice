@@ -29,6 +29,14 @@ func (h *handler) serveJsFile(w http.ResponseWriter, r *http.Request, ps httprou
 	CheckError(err)
 }
 
+// serveFile is handler for general file request
 func (h *handler) serveFile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	// todo 这里没有完成
+	// filePath = css/archive.css
+	rootPath := strings.Trim(h.RootPath, "/")
+	urlPath := strings.Trim(r.URL.Path, "/")
+	filePath := strings.TrimPrefix(urlPath, rootPath)
+	filePath = strings.Trim(filePath, "/")
+
+	err := serveFile(w, filePath, true)
+	CheckError(err)
 }
