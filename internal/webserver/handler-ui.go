@@ -2,6 +2,7 @@ package webserver
 
 import (
 	"github.com/julienschmidt/httprouter"
+	"log"
 	"net/http"
 	"path"
 	fp "path/filepath"
@@ -38,5 +39,53 @@ func (h *handler) serveFile(w http.ResponseWriter, r *http.Request, ps httproute
 	filePath = strings.Trim(filePath, "/")
 
 	err := serveFile(w, filePath, true)
+	CheckError(err)
+}
+
+// serveIndexPage is handler for GET /
+func (h *handler) serveIndexPage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	// make sure session still valid
+	err := h.validateSession(r)
+	if err != nil {
+		newPath := path.Join(h.RootPath, "/login")
+		redirectURL := createRedirectURL(newPath, r.URL.String())
+		redirectPage(w, r, redirectURL)
+		return
+	}
+
+	if developmentMode {
+		//todo h.prepareTemplates() 没有完成
+		if err := h.prepareTemplates(); err != nil {
+			log.Printf("error during template preparation : %s", err)
+		}
+	}
+
+	err = h.templates["index"].Execute(w, h.RootPath)
+	CheckError(err)
+}
+
+// serveLoginPage is handler for GET /login
+func (h *handler) serveLoginPage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	// Make sure session is not valid
+	err := h.validateSession(r)
+	if err == nil {
+		redirectURL := path.Join(h.RootPath, "/")
+		redirectPage(w, r, redirectURL)
+		return
+	}
+
+	if developmentMode {
+		if err := h.prepareTemplates(); err != nil {
+			log.Printf("error during template preparation: %s", err)
+		}
+	}
+
+	err = h.templates["login"].Execute(w, h.RootPath)
+	CheckError(err)
+}
+
+// serveVueDemoPage is handler for GET /login
+func (h *handler) serveVueDemoPage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	err := h.templates["vue-demo"].Execute(w, h.RootPath)
 	CheckError(err)
 }

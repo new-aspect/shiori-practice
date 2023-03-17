@@ -151,7 +151,11 @@ func ServeApp(cfg Config) error {
 	router.GET(jp("/js/*filepath"), withLogging(hdl.serveJsFile))
 	router.GET(jp("/res/*filepath"), withLogging(hdl.serveFile))
 	router.GET(jp("/css/*filepath"), withLogging(hdl.serveFile))
-	router.GET(jp("/founts/*filepath"), withLogging(hdl.serveFile))
+	router.GET(jp("/fonts/*filepath"), withLogging(hdl.serveFile))
+
+	router.GET(cfg.RootPath, withLogging(hdl.serveIndexPage))
+	router.GET(jp("/login"), withLogging(hdl.serveLoginPage))
+	router.GET(jp("/vue-demo"), withLogging(hdl.serveVueDemoPage))
 
 	// todo 这里还有很多接口
 

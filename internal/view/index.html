@@ -4,7 +4,22 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<body>
+<body class="night">
+<div id="main-scene" :class="{night: appOptions.nightMode}">
+    <div id="main-sidebar">
+        <a v-for="item in sidebarItems" :title="item.title" :class="{active: activePage === item.page}" @click="switchPage(item.page)">
+            <i class="fas fa-fw" :class="item.icon"></i>
+        </a>
+        <div class="spacer"></div>
+        <a title="Logout" @click="logout">
+            <i class="fas fa-fw fa-sign-out-alt"></i>
+        </a>
+    </div>
+    <keep-alive>
+        <component :is="activePage" :active-account="activeAccount" :app-options="appOptions" @setting-changed="saveSetting"></component>
+    </keep-alive>
+    <custom-dialog v-bind="dialog" />
+</div>
 
 </body>
 </html>

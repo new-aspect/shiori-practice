@@ -2,10 +2,12 @@ package webserver
 
 import (
 	"fmt"
+	"html/template"
 	"io"
 	"mime"
 	"net"
 	"net/http"
+	nurl "net/url"
 	"os"
 	fp "path/filepath"
 	"strings"
@@ -73,7 +75,8 @@ func assetExists(filePath string) bool {
 // 否则，它会引发一个panic，其中包含传递的错误。
 // 这个方法通常用于处理网络连接时的错误，以防止程序因为连接问题而崩溃。
 func CheckError(err error) {
-	if err != nil {
+	// 这里粗心了，是err为空时不处理，err不为空是处理
+	if err == nil {
 		return
 	}
 
@@ -131,4 +134,38 @@ func serveFile(w http.ResponseWriter, filePath string, cache bool) error {
 	// serve file
 	_, err = io.Copy(w, src)
 	return err
+}
+
+func createRedirectURL(newPath, previousPath string) string {
+	urlQueries := nurl.Values{}
+	urlQueries.Set("det", previousPath)
+
+	redirectURL, _ := nurl.Parse(newPath)
+	redirectURL.RawQuery = urlQueries.Encode()
+	return redirectURL.String()
+}
+
+func redirectPage(w http.ResponseWriter, r *http.Request, url string) {
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Expires", "0")
+	http.Redirect(w, r, url, http.StatusMovedPermanently)
+}
+
+func createTemplate(filename string, funcMap template.FuncMap) (*template.Template, error) {
+	// Open file
+	src, err := assets.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer src.Close()
+
+	// Read file content
+	srcContent, err := io.ReadAll(src)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create tempate
+	return template.New(filename).Delims("$$", "$$").Funcs(funcMap).Parse(string(srcContent))
 }
