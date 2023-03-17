@@ -17,6 +17,10 @@
             </span>
     </div>
 
+    <div id="app3">
+        <p v-if="seen">现在你看到我了</p>
+    </div>
+
 <script>
     var app = new Vue({
         el: "#app",
@@ -32,6 +36,12 @@
         }
     })
 
+    var app3 = new Vue({
+        el: "#app3",
+        data: {
+            seen: false
+        }
+    })
 
 </script>
 

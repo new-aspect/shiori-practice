@@ -7,33 +7,48 @@
     <link href="css/stylesheet.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 </head>
-<body>
-    <div id="app">
-        {{ message }}
+    <body>
+    <div id="login-scene" :class="{night: nightMode}">
+        <p class="error-message" v-if="error !==''">{{error}}</p>
+        <div id="login-box">
+            <!--  prevent是阻止的意思，@submit.prevent="login"这是Vue.js中的一个表单（form）元素，它使用了Vue的指令（directive）@submit.prevent来阻止默认的表单提交行为，并将表单的提交事件绑定到Vue实例中的一个方法login上。当用户在表单中提交数据时，将触发login方法并执行相应的逻辑。具体的实现可能需要更多的上下文和代码信息才能确定。          -->
+            <form @submit.prevent="login">
+                <div id="logo-area">
+                    <span>宁</span>shiori
+                </div>
+                <p id="tagline">simple bookmark manager</p>
+                <div id="input-area">
+                    <label for="username">Username: </label>
+                    <!--      这是一段HTML代码，其中包含一个输入框元素，其id为“username”，类型为“text”，名称为“username”，占位符为“Username”，并且具有tabindex属性和autofocus属性。这段代码通常用于创建一个带有用户名输入框的表单。              -->
+                    <input id="username" type="text" name="username" placeholder="Username" tabindex="1" autofocus>
+                    <label for="password">Password: </label>
+                    <input id="password" type="password" name="password" placeholder="Password" tabindex="2"
+                        @Keyup.entry="login">
+                    <label class="checkbox-field">
+                        <input type="checkbox" name="remember" v-model="remember" tabindex="3"> Remember me
+                    </label>
+
+
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div id="app-2">
-  <span v-bind:title="message">
-    鼠标悬停几秒钟查看此处动态绑定的提示信息！
-  </span>
-    </div>
-    <!-- 说明这行div-->
-<!--    <div id="login-scene" :class="{night:nightMode}">-->
-<!--        <p class="error-message" v-if="error !== ''" > </p>>-->
-<!--    </div>-->
-</body>
-<script>
-    var app = new Vue({
-        el: '#app',
-        data: {
-            message: 'Hello Vue!'
-        }
-    })
-    var app2 = new Vue({
-        el: '#app-2',
-        data: {
-            message: '页面加载于 ' + new Date().toLocaleString()
-        }
-    })
-</script>
+
+    </body>
+    <script type="module">
+        var app = new Vue({
+            el: "#login-scene",
+            data: {
+
+            },
+            method: {
+                login() {
+                    this.username = document.querySelector("#username").value;
+
+                }
+            }
+        })
+    </script>
+
 </html>
