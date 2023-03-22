@@ -157,6 +157,7 @@ func ServeApp(cfg Config) error {
 	router.GET(jp("/login"), withLogging(hdl.serveLoginPage))
 	router.GET(jp("/vue-demo"), withLogging(hdl.serveVueDemoPage))
 
+	router.POST(jp("/api/login"), withLogging(hdl.apiLogin))
 	// todo 这里还有很多接口
 
 	router.PanicHandler = func(w http.ResponseWriter, r *http.Request, arg interface{}) {

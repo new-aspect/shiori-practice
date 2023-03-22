@@ -138,7 +138,7 @@ func serveFile(w http.ResponseWriter, filePath string, cache bool) error {
 
 func createRedirectURL(newPath, previousPath string) string {
 	urlQueries := nurl.Values{}
-	urlQueries.Set("det", previousPath)
+	urlQueries.Set("dst", previousPath)
 
 	redirectURL, _ := nurl.Parse(newPath)
 	redirectURL.RawQuery = urlQueries.Encode()
@@ -167,5 +167,6 @@ func createTemplate(filename string, funcMap template.FuncMap) (*template.Templa
 	}
 
 	// Create tempate
+	// 在这里，template.Delims() 函数用于更改模板的定界符为 $$。
 	return template.New(filename).Delims("$$", "$$").Funcs(funcMap).Parse(string(srcContent))
 }

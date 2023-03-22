@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="$$.$$">
     <meta charset="UTF-8">
     <title>Title</title>
     <!--  开发环境，包含了有帮助的命令行警告  -->
@@ -19,6 +20,19 @@
 
     <div id="app3">
         <p v-if="seen">现在你看到我了</p>
+    </div>
+
+    <div id="app4">
+        <ol>
+            <li v-for="todo in todos">
+                {{ todo.text }}
+            </li>
+        </ol>
+    </div>
+
+    <div id="app5">
+        <p>{{ message2 }}</p>
+        <button v-on:click = "reverseMessage">反转消息</button>
     </div>
 
 <script>
@@ -40,6 +54,29 @@
         el: "#app3",
         data: {
             seen: false
+        }
+    })
+
+    var app4 = new Vue({
+        el: "#app4",
+        data: {
+            todos: [
+                { text: '学习JavaScript'},
+                { text: '学习vue'},
+                { text: '整个牛项目'}
+            ]
+        }
+    })
+
+    var app5 = new Vue({
+        el : `#app5`,
+        data: {
+            message2: 'Hello Vue.js!'
+        },
+        methods: {
+            reverseMessage: function () {
+                this.message2 = this.message2.split('').reverse().join('')
+            }
         }
     })
 

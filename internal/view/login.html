@@ -1,54 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="$$.$$">
     <meta charset="UTF-8">
     <title>Title</title>
-<!--   这是一个HTML标签，它被用来在HTML文档中链接到外部样式表（CSS文件）。该标签包括一个href属性，该属性指定了样式表文件的路径（在此例中为“css/stylesheet.css”），以及一个rel属性，该属性指定了链接的文档与被链接的文档之间的关系。在这种情况下，rel属性的值为“stylesheet”，表明被链接的文档是一个CSS样式表。这个标签告诉浏览器去加载外部CSS文件并将其应用于当前的HTML文档。 -->
+    <!--   这是一个HTML标签，它被用来在HTML文档中链接到外部样式表（CSS文件）。该标签包括一个href属性，该属性指定了样式表文件的路径（在此例中为“css/stylesheet.css”），以及一个rel属性，该属性指定了链接的文档与被链接的文档之间的关系。在这种情况下，rel属性的值为“stylesheet”，表明被链接的文档是一个CSS样式表。这个标签告诉浏览器去加载外部CSS文件并将其应用于当前的HTML文档。 -->
     <link href="css/stylesheet.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsurl/2.3.4/url.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 </head>
-    <body>
-    <div id="login-scene" :class="{night: nightMode}">
-        <p class="error-message" v-if="error !==''">{{error}}</p>
-        <div id="login-box">
-            <!--  prevent是阻止的意思，@submit.prevent="login"这是Vue.js中的一个表单（form）元素，它使用了Vue的指令（directive）@submit.prevent来阻止默认的表单提交行为，并将表单的提交事件绑定到Vue实例中的一个方法login上。当用户在表单中提交数据时，将触发login方法并执行相应的逻辑。具体的实现可能需要更多的上下文和代码信息才能确定。          -->
-            <form @submit.prevent="login">
-                <div id="logo-area">
-                    <span>宁</span>shiori
-                </div>
-                <p id="tagline">simple bookmark manager</p>
-                <div id="input-area">
-                    <label for="username">Username: </label>
-                    <!--      这是一段HTML代码，其中包含一个输入框元素，其id为“username”，类型为“text”，名称为“username”，占位符为“Username”，并且具有tabindex属性和autofocus属性。这段代码通常用于创建一个带有用户名输入框的表单。              -->
-                    <input id="username" type="text" name="username" placeholder="Username" tabindex="1" autofocus>
-                    <label for="password">Password: </label>
-                    <input id="password" type="password" name="password" placeholder="Password" tabindex="2"
-                        @Keyup.entry="login">
-                    <label class="checkbox-field">
-                        <input type="checkbox" name="remember" v-model="remember" tabindex="3"> Remember me
-                    </label>
-
-
-                </div>
-            </form>
-        </div>
+<body>
+<div id="login-scene" :class="{night: nightMode}">
+    <p class="error-message" v-if="error !==''">{{error}}</p>
+    <div id="login-box">
+        <!--  prevent是阻止的意思，@submit.prevent="login"这是Vue.js中的一个表单（form）元素，它使用了Vue的指令（directive）@submit.prevent来阻止默认的表单提交行为，并将表单的提交事件绑定到Vue实例中的一个方法login上。当用户在表单中提交数据时，将触发login方法并执行相应的逻辑。具体的实现可能需要更多的上下文和代码信息才能确定。          -->
+        <form @submit.prevent="login">
+            <div id="logo-area">
+                <span>宁</span>shiori
+            </div>
+            <p id="tagline">simple bookmark manager</p>
+            <div id="input-area">
+                <label for="username">Username: </label>
+                <!--      这是一段HTML代码，其中包含一个输入框元素，其id为“username”，类型为“text”，名称为“username”，占位符为“Username”，并且具有tabindex属性和autofocus属性。这段代码通常用于创建一个带有用户名输入框的表单。              -->
+                <input id="username" type="text" name="username" placeholder="Username" tabindex="1" autofocus>
+                <label for="password">Password: </label>
+                <input id="password" type="password" name="password" placeholder="Password" tabindex="2"
+                       @keyup.entry="login">
+                <label class="checkbox-field">
+                    <input type="checkbox" name="remember" v-model="remember" tabindex="3"> Remember me
+                </label>
+            </div>
+            <!--       这里应该是登录页面         -->
+            <div id="button-area">
+                <!--   a是超链接，i表示以斜体展示                 -->
+                <a v-if="loading">
+                    <i class="fas fa-fw fa-spiner fa-spin"></i>
+                </a>
+                <!-- @click属性表示当用户点击该元素时，将执行Vue实例中的login方法。
+                    @keyup.enter表示当用户在该元素上按下回车键时，将执行Vue实例中的login方法。-->
+                <a v-else class="button" tabindex="4" @click="login" @keyup.enter="login">Login</a>
+            </div>
+        </form>
     </div>
+</div>
+
+<script type="module">
+    var app = new Vue({
+        el: "#login-scene",
+        data: {
+            error: "",
+            loading : false,
+            username: "",
+            password: "",
+            remember: false,
+        },
+        // 这是methods，不是method，这是我犯的错误
+        methods: {
+            // 这是一个js的异步方法
+            async getErrorMessage(err) {
+                switch (err.constructor) {
+                    case Error:
+                        return err.message;
+                    case Response:
+                        var text = await err.text();
+                        return `${text} (${err.status})`;
+                    default:
+                        return err;
+                }
+            },
+            login() {
+                this.username = document.querySelector("#username").value;
+                this.password = document.querySelector("#password").value;
+
+                // Validate input
+                if (this.username === "") {
+                    this.error = "Username must not empty";
+                    return;
+                }
+
+                // Remove old cookie
+                //这段代码是 JavaScript 代码，它的作用是删除浏览器中名为 "session-id" 的 cookie。
+                // 注意每个cookie是带path路径的，例如这个参数的值 session-id=; Path=/login; Expires=Thu, 01 Jan 1970 00:00:00 GMT;
+                // 表示在/login路径下创建cookie为session-id,过期时间是1970年，也就是马上过期，准确说他会覆盖掉原来在/login路径下的名字叫session-id的cookie，过期时间是1970年，也就是直接删除
+                document.cookie = `session-id=; Path=${new URL(document.baseURI).pathname}; Expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+
+                // Send request
+                this.loading = true;
+
+                //这是一个使用JavaScript编写的网络请求代码，它会向指定的URL（相对于当前页面的路径）发送POST请求，包含JSON格式的请求体（request body），其中包括用户名、密码和一个记住登录状态的标志。
+
+                // 具体来说，该请求包括以下内容：
+                //
+                // 请求方法（method）：POST，表示这是一个提交数据的请求。
+                // 请求体（body）：使用JSON.stringify()方法将一个JavaScript对象序列化为JSON字符串，并作为请求体发送到服务器。该对象包括3个属性：
+                // username：表示用户名。
+                // password：表示密码。
+                // remember：表示记住登录状态的标志。如果该属性的值为1，则表示要记住登录状态，否则不记住。
+                // 请求头（headers）：包含Content-Type属性，指定请求体的格式为JSON格式。
+                // 需要注意的是，该代码中使用了一些ES6语法，如箭头函数、三目运算符等。如果在较老的浏览器中运行，可能需要进行转换或使用polyfill库。
+                fetch(new URL("api/login", document.baseURI),{
+                    method: "post",
+                    body: JSON.stringify({
+                        username: this.username,
+                        password: this.password,
+                        remember: this.remember == 1 ?true :false,
+                    }),
+                    headers : {"Content-Type": "application/json"},
+                }).then(response => {
+                    if (!response.ok) throw response;
+                    return response.json();
+                }).then(json => {
+                    // Save session id
+                    document.cookie = `session-id=${json.session}; Path=${new URL(document.baseURI).pathname}; Expires=${json.expires}`;
+
+                    // Save account data
+                    localStorage.setItem("shiori-account", JSON.stringify(json.account));
+
+                    // Go to destination page
+                    // 如果 currentUrl.hash 不存在，那么 dstPage 将默认为字符串 "home"
+                    var currentUrl = new Url,
+                        dstUrl = currentUrl.query.dst,
+                        dstPage = currentUrl.hash || "home";
+
+                    if (dstPage !== "home" && dstPage !== "setting") {
+                        dstPage = "";
+                    }
+
+                    var newUrl = new Url(dstUrl || document.baseURI);
+                    newUrl.hash = dstPage;
+
+                    // 最后，该代码将构建好的新 URL 赋值给 location.href 属性，这将导致浏览器跳转到该 URL 指定的页面。
+                    location.href = newUrl;
+                }).catch(err => {
+                    this.loading = false
+                    this.getErrorMessage(err).then(msg => {
+                        this.error = msg;
+                    })
+                });
 
 
-    </body>
-    <script type="module">
-        var app = new Vue({
-            el: "#login-scene",
-            data: {
+
 
             },
-            method: {
-                login() {
-                    this.username = document.querySelector("#username").value;
+        }
+    })
+</script>
 
-                }
-            }
-        })
-    </script>
+
+</body>
 
 </html>

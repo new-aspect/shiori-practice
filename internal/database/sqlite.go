@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlite"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
@@ -61,4 +62,47 @@ func (*SQLiteDatabase) SaveBookmarks(ctx context.Context, create bool, bookmarks
 
 func (*SQLiteDatabase) GetBookMarks(ctx context.Context, opts GetBookmarksOptions) ([]model.Bookmark, error) {
 	return nil, nil
+}
+
+// GetAccount fetch account with matching username.
+// Returns the account and boolean whether it's exist or not.
+func (db *SQLiteDatabase) GetAccount(ctx context.Context, username string) (model.Account, bool, error) {
+	account := model.Account{}
+	err := db.GetContext(ctx, &account, `SELECT 
+    	id, username, owner FROM account where username = ?`,
+		username)
+	if err != nil {
+		//errors.WithStack(err) 是 Go 语言 errors 包中的一个函数，它的作用是将原始错误（err）包装为一个新的错误，该新错误包含了堆栈跟踪信息。
+		return account, false, errors.WithStack(err)
+	}
+
+	return account, account.ID != 0, nil
+}
+
+// GetAccounts fetch list of account (without its password) based on submitted options
+func (db *SQLiteDatabase) GetAccounts(ctx context.Context, opts GetAccountsOptions) ([]model.Account, error) {
+	// Create query
+	args := []interface{}{}
+	query := `SELECT id, username, owner FROM  account where 1`
+
+	if opts.Keyword != "" {
+		query += "AND username LIKE ? "
+		args = append(args, "%"+opts.Keyword+"%")
+	}
+
+	if opts.Owner {
+		query += " AND owner = 1"
+	}
+	query += " ORDER BY username"
+
+	// Fetch list account
+	var accounts []model.Account
+	err := db.SelectContext(ctx, &accounts, query, args...)
+	if err != nil && err != sql.ErrNoRows {
+		// WithStack在WithStack被调用时用堆栈跟踪来注释err。
+		// 如果err是nil，WithStack返回nil。
+		return nil, errors.WithStack(err)
+	}
+
+	return accounts, nil
 }

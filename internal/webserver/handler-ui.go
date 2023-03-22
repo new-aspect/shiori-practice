@@ -86,6 +86,7 @@ func (h *handler) serveLoginPage(w http.ResponseWriter, r *http.Request, ps http
 
 // serveVueDemoPage is handler for GET /login
 func (h *handler) serveVueDemoPage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	// 啊，你原来是在这里设置的rootPath ，我哭了
 	err := h.templates["vue-demo"].Execute(w, h.RootPath)
 	CheckError(err)
 }
