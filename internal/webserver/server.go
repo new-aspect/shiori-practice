@@ -155,7 +155,7 @@ func ServeApp(cfg Config) error {
 
 	router.GET(cfg.RootPath, withLogging(hdl.serveIndexPage))
 	router.GET(jp("/login"), withLogging(hdl.serveLoginPage))
-	router.GET(jp("/vue-demo"), withLogging(hdl.serveVueDemoPage))
+	router.GET(jp("/v"), withLogging(hdl.serveVueDemoPage))
 
 	router.POST(jp("/api/login"), withLogging(hdl.apiLogin))
 	// todo 这里还有很多接口

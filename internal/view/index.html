@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="$$.$$">
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsurl/2.3.4/url.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 </head>
 <body class="night">
+<!-- 这是vue -->
 <div id="main-scene" :class="{night: appOptions.nightMode}">
+    <!--   具有多个选项的侧边栏 -->
     <div id="main-sidebar">
-        <a v-for="item in sidebarItems" :title="item.title" :class="{active: activePage === item.page}" @click="switchPage(item.page)">
+        <a v-for="item in sidebarItems" :title="item.title" :class="{active: activePage === item.page}"
+           @click="switchPage(item.page)">
             <i class="fas fa-fw" :class="item.icon"></i>
         </a>
         <div class="spacer"></div>
@@ -15,10 +21,83 @@
             <i class="fas fa-fw fa-sign-out-alt"></i>
         </a>
     </div>
+
+
+    <!--    -->
     <keep-alive>
-        <component :is="activePage" :active-account="activeAccount" :app-options="appOptions" @setting-changed="saveSetting"></component>
+        <component :is="activePage" :active-account="activeAccount" :app-options="appOptions"
+                   @setting-changed="saveSetting"></component>
     </keep-alive>
-    <custom-dialog v-bind="dialog" />
+    <custom-dialog v-bind="dialog"/>
+
+    <script type="module">
+        import basePage from "./js/page/base.js";
+        import pageHome from "./js/page/home.js";
+        import pageSetting from "./js/page/setting.js";
+        import customDialog from "./js/component/dialog.js";
+
+        var app = new Vue({
+            el: `#main-scene`,
+            // mixins 是一种可以混合的方式
+            mixins: [basePage],
+            // components是vue的一种可以复用的组件     参考https://v2.cn.vuejs.org/v2/guide/components.html
+            components: {
+                pageHome,
+                pageSetting,
+                customDialog,
+            },
+            data: {
+                activePage: "page-home",
+                sidebarItems: [{
+                    title: "Home",
+                    icon: "fa-home",
+                    page: "page-home",
+                },{
+                    title: "Setting",
+                    icon: "fa-cog",
+                    page: "page-setting",
+                }]
+            },
+            methods: {
+                loadSetting() {
+                    var opts = JSON.parse(localStorage.getItem("shiori-setting")) || {},
+                        showId = (typeof opts.showId === "boolean") ?opts.showId :false
+                    // todo 这里还有很多没有写
+                },
+                loadAccount() {
+                    var account = JSON.parse(localStorage.getItem("shiori-account")) || {},
+                        username = (typeof account.username === "string")? account.username :"",
+                        owner = (typeof account.owner === "boolean") ? account.owner :false;
+
+                    // todo 记得这里page.js需要写这个activeAccount
+                    this.activeAccount = {
+                        id :id,
+                        username: username,
+                        owner: owner,
+                    };
+                }
+            },
+            // 这段代码是 Vue 2 中的 mounted 生命周期钩子函数，用于在组件实例被挂载后执行一些初始化的操作。该函数主要做了以下几件事情
+            // 调用 loadSetting() 和 loadAccount() 方法，加载一些设置和账户信息。
+            // 注册一个 popstate 事件的监听器 stateWatcher，用于监听浏览器历史记录的变化，并在浏览器的前进或后退按钮被点击时更新页面的状态。
+            // 在组件销毁前，通过 $once 方法注册了一个监听器，用于在组件销毁前移除 popstate 事件的监听器 stateWatcher。
+            // 设置默认的页面状态 activePage，如果 URL 中没有指定页面，则默认为 home 页面，并将 activePage 设置为 page-home；如果 URL 中指定了其他页面，则将 activePage 设置为对应的页面状态，并更新浏览器历史记录。
+            method(){
+                // Load setting
+                this.loadSetting();
+                this.loadAccount();
+
+                // Prepare history state watcher
+                var stateWatcher = (e) => {
+                    var state = e.state || {};
+                    this.activePage = state.activePage || "page-home";
+                }
+
+                // todo 后面没有做完
+            }
+
+        })
+    </script>
 </div>
 
 进入这里了

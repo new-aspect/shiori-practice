@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--  开发环境，包含了有帮助的命令行警告  -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<!--    <script src="js/demo/exampleMixin.js"></script>-->
+</head>
+<body>
+<div id="app">
+    {{message}}
+</div>
+
+<script type="module">
+    // import exampleMixin from "./js/demo/exampleMixin.js";
+    //
+    // var app = new Vue({
+    //
+    //     mixins: [exampleMixin],
+    // })
+
+
+    var mixin = {
+        data: {
+            message: "Hello, this is mixin"
+        }
+    }
+
+    new Vue({
+        el: "#app",
+        mixins: [mixin],
+        // data: function () {
+        //     return {
+        //         message: 'goodbye',
+        //         bar: 'def'
+        //     }
+        // },
+        // created: function () {
+        //     console.log(this.$data)
+        //     // => { message: "goodbye", foo: "abc", bar: "def" }
+        // }
+    })
+</script>
+
+</body>
+</html>

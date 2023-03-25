@@ -45,7 +45,7 @@ func (h *handler) prepareTemplates() error {
 	}
 
 	// Create template for login, index and content
-	for _, name := range []string{"login", "index", "content", "vue-demo"} {
+	for _, name := range []string{"login", "index", "content", "v1", "v2"} {
 		h.templates[name], err = createTemplate(name+".html", funcMap)
 		if err != nil {
 			return err
